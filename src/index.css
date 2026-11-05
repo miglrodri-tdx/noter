@@ -1,0 +1,93 @@
+@import "tailwindcss";
+@import "./themes/andromeda.css";
+@import "./themes/ayudark.css";
+@import "./themes/catppuccin.css";
+@import "./themes/everforest.css";
+@import "./themes/flexoki.css";
+@import "./themes/githubdark.css";
+@import "./themes/githublight.css";
+@import "./themes/gruvbox.css";
+@import "./themes/kanagawa.css";
+@import "./themes/monokai.css";
+@import "./themes/nightfox.css";
+@import "./themes/nightowl.css";
+@import "./themes/onedarkpro.css";
+@import "./themes/rosepine.css";
+@import "./themes/solarized.css";
+@import "./themes/tokyonight.css";
+@import "./themes/vscode.css";
+@plugin "daisyui" {
+  themes: false;
+}
+@plugin "daisyui/theme" {
+  name: "noter";
+  default: true;
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f5f5f5;
+  --color-base-300: #e5e5e5;
+  --color-base-content: #262626;
+  --color-primary: #262626;
+  --color-primary-content: #ffffff;
+  --color-neutral: #262626;
+  --color-neutral-content: #ffffff;
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(76% 0.177 163.223);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(71% 0.194 13.428);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-box: 0.5rem;
+  --radius-field: 0.375rem;
+}
+
+@plugin "daisyui/theme" {
+  name: "noter-dark";
+  default: false;
+  color-scheme: dark;
+  --color-base-100: #121212;
+  --color-base-200: #1a1a1a;
+  --color-base-300: #2a2a2a;
+  --color-base-content: #e5e5e5;
+  --color-primary: #e5e5e5;
+  --color-primary-content: #121212;
+  --color-neutral: #e5e5e5;
+  --color-neutral-content: #121212;
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(76% 0.177 163.223);
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(71% 0.194 13.428);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-box: 0.5rem;
+  --radius-field: 0.375rem;
+}
+
+@theme {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--color-base-100);
+  color: var(--color-base-content);
+  font-family: var(--font-sans);
+}
+
+/* Note colors derive from the active theme, so they adapt to every theme. */
+.note-yellow { background: color-mix(in oklab, var(--color-warning) 22%, var(--color-base-100)); }
+.note-pink   { background: color-mix(in oklab, var(--color-error) 18%, var(--color-base-100)); }
+.note-blue   { background: color-mix(in oklab, var(--color-info) 20%, var(--color-base-100)); }
+.note-green  { background: color-mix(in oklab, var(--color-success) 20%, var(--color-base-100)); }
+.note-gray   { background: color-mix(in oklab, var(--color-base-content) 8%, var(--color-base-100)); }
+.dot-yellow { background: var(--color-warning); }
+.dot-pink   { background: var(--color-error); }
+.dot-blue   { background: var(--color-info); }
+.dot-green  { background: var(--color-success); }
+.dot-gray   { background: color-mix(in oklab, var(--color-base-content) 35%, var(--color-base-100)); }

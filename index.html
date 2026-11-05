@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" data-theme="githublight">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='5' width='22' height='22' rx='4' fill='%23fde68a'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&display=swap" rel="stylesheet" />
+    <script>
+      try {
+        var d = { light: 'githublight', dark: 'githubdark' };
+        var raw = localStorage.getItem('noter:theme:v2');
+        var s = raw ? JSON.parse(raw) : null;
+        var mode = s && s.mode ? s.mode : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', (s && s[mode]) || d[mode]);
+      } catch (e) {}
+    </script>
+    <title>noter</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
