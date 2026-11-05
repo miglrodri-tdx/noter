@@ -16,10 +16,11 @@ interface Props {
   onTheme: (id: string) => void
   onExport: () => void
   onImport: (backup: Backup) => void
+  onShowIntro: () => void
   onClose: () => void
 }
 
-export function SettingsModal({ mode, theme, onMode, onTheme, onExport, onImport, onClose }: Props) {
+export function SettingsModal({ mode, theme, onMode, onTheme, onExport, onImport, onShowIntro, onClose }: Props) {
   const fileInput = useRef<HTMLInputElement>(null)
   const [staged, setStaged] = useState<Backup | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -123,6 +124,10 @@ export function SettingsModal({ mode, theme, onMode, onTheme, onExport, onImport
         </section>
 
         <p className="mt-5 text-xs text-base-content/40">
+          <button className="link" onClick={onShowIntro}>
+            Show intro again
+          </button>
+          {' · '}
           Themes by{' '}
           <a className="link" href="https://github.com/dachinat/daisyui-themes" target="_blank" rel="noreferrer">
             dachinat

@@ -8,6 +8,7 @@ import { ConfirmDialog } from "./ConfirmDialog";
 import { downloadBackup, type Backup } from "./backup";
 import { SettingsModal } from "./SettingsModal";
 import { StickyNote } from "./StickyNote";
+import { Onboarding, hasSeenOnboarding, markOnboarded, ONBOARDED_KEY } from "./ui/Onboarding";
 import { NOTE_DEFAULT } from "./types";
 import { useCanvases } from "./useCanvases";
 import { useTheme } from "./useTheme";
@@ -65,6 +66,11 @@ export default function App() {
   });
 
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [introOpen, setIntroOpen] = useState(() => !hasSeenOnboarding());
+  const closeIntro = () => {
+    markOnboarded();
+    setIntroOpen(false);
+  };
   const {
     state: themeState,
     mode,
@@ -88,7 +94,7 @@ export default function App() {
   // 1–9 jump to the nth canvas. Plain digits are ignored while typing;
   // Alt/Option+digit works everywhere, even inside a note.
   const { canvases } = c;
-  const modalOpen = settingsOpen || pending !== null;
+  const modalOpen = settingsOpen || introOpen || pending !== null;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const m = /^Digit([1-9])$/.exec(e.code);
@@ -267,9 +273,20 @@ export default function App() {
             c.replaceAll(b.canvas);
             if (b.theme) replaceTheme(b.theme);
           }}
+          onShowIntro={() => {
+            try {
+              localStorage.removeItem(ONBOARDED_KEY);
+            } catch {
+              // ignore
+            }
+            setSettingsOpen(false);
+            setIntroOpen(true);
+          }}
           onClose={() => setSettingsOpen(false)}
         />
       )}
+
+      {introOpen && !settingsOpen && <Onboarding onClose={closeIntro} />}
 
       {pending?.kind === "note" && (
         <ConfirmDialog
