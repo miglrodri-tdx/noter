@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, type DragEvent, type PointerEvent, type ReactNode } from 'react'
-import { LuCalendar, LuGripHorizontal, LuMaximize2, LuMinus, LuTag, LuTrash2, LuX } from 'react-icons/lu'
+import { LuCalendar, LuGripHorizontal, LuMaximize2, LuMic, LuMinus, LuTag, LuTrash2, LuX } from 'react-icons/lu'
 import { RxCornerBottomRight } from 'react-icons/rx'
+import { deleteAudio } from './audioStore'
 import { formatDue, isOverdue } from './due'
+import { AudioBar } from './NoteAudio'
+import { canRecord, useRecorder } from './useRecorder'
 import { COLORS, NOTE_BG as BG, NOTE_DEFAULT, NOTE_MAX, NOTE_MIN, type Note, type NoteColor } from './types'
 
 const DOT: Record<NoteColor, string> = {
@@ -110,8 +113,22 @@ export function StickyNote({ note, tags, autoFocus, selected, onChange, onRemove
   const commit = (patch: Partial<Note>) =>
     onChange(
       note.id,
-      ['text', 'color', 'collapsed', 'due', 'tag'].some((k) => k in patch) ? { ...patch, draft: false } : patch,
+      ['text', 'color', 'collapsed', 'due', 'tag', 'audio'].some((k) => k in patch) ? { ...patch, draft: false } : patch,
     )
+
+  const recorder = useRecorder({
+    onStart: () => onChange(note.id, { draft: false }),
+    onDone: (audio) => commit({ audio }),
+  })
+  const stopRecording = recorder.stop
+  // collapsing the note ends an ongoing recording (it is saved, not discarded)
+  useEffect(() => {
+    if (collapsed) stopRecording()
+  }, [collapsed, stopRecording])
+  const removeAudio = () => {
+    if (note.audio) void deleteAudio([note.audio.id])
+    commit({ audio: undefined })
+  }
 
   const root = useRef<HTMLDivElement>(null)
   const tools = useRef<HTMLDivElement>(null)
@@ -219,6 +236,13 @@ export function StickyNote({ note, tags, autoFocus, selected, onChange, onRemove
             {note.text.split('\n').find((l) => l.trim()) || <span className="text-base-content/40">Empty note</span>}
           </span>
         )}
+        {collapsed && (note.audio || recorder.recording) && (
+          <LuMic
+            size={12}
+            aria-label={recorder.recording ? 'Recording' : 'Has voice recording'}
+            className={`shrink-0 ${recorder.recording ? 'animate-pulse text-error' : ''}`}
+          />
+        )}
         <div
           ref={tools}
           className="flex shrink-0 items-center gap-1.5 opacity-0 transition-opacity group-data-[selected=true]:opacity-100 group-hover:opacity-100"
@@ -309,6 +333,16 @@ export function StickyNote({ note, tags, autoFocus, selected, onChange, onRemove
                   />
                 )}
               </div>
+              {canRecord && !note.audio && !recorder.recording && (
+                <button
+                  aria-label="Record voice note"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={() => void recorder.start()}
+                  className="cursor-pointer text-base-content/40 hover:text-base-content"
+                >
+                  <LuMic size={13} />
+                </button>
+              )}
             </>
           )}
           <button
@@ -351,6 +385,16 @@ export function StickyNote({ note, tags, autoFocus, selected, onChange, onRemove
             />
           )}
         </div>
+      )}
+      {!collapsed && (
+        <AudioBar
+          clip={note.audio}
+          recording={recorder.recording}
+          elapsed={recorder.elapsed}
+          error={recorder.error}
+          onStop={recorder.stop}
+          onDelete={removeAudio}
+        />
       )}
       {!collapsed && (
       <textarea

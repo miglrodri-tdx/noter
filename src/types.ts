@@ -9,6 +9,14 @@ export const NOTE_BG: Record<NoteColor, string> = {
   gray: 'note-gray',
 }
 
+/** Reference to a voice recording; the audio blob itself lives in IndexedDB (see audioStore.ts). */
+export interface AudioClip {
+  id: string
+  /** seconds, measured while recording (MediaRecorder output has no reliable duration) */
+  duration: number
+  mime: string
+}
+
 export interface Note {
   id: string
   x: number
@@ -23,6 +31,8 @@ export interface Note {
   due?: string
   /** free-form category; becomes a kanban column */
   tag?: string
+  /** one voice recording per note */
+  audio?: AudioClip
   /** freshly created and untouched: removed when focus leaves it. Cleared on first text/color/collapse change. */
   draft?: boolean
 }

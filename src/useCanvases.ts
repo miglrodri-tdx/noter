@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { deleteAudio } from './audioStore'
 import { parseCanvasState, parseNotes, type CanvasState } from './storage'
 import { NOTE_DEFAULT, type Canvas, type Note } from './types'
 
@@ -30,10 +31,14 @@ function load(): State {
 
 const topZ = (notes: Note[]) => notes.reduce((m, n) => Math.max(m, n.z), 0) + 1
 
+const audioIds = (canvases: Canvas[]) => canvases.flatMap((c) => c.notes.flatMap((n) => (n.audio ? [n.audio.id] : [])))
+
 export function useCanvases() {
   const [state, setState] = useState<State>(load)
+  const latest = useRef(state) // lets callbacks read current state to find recordings to clean up
 
   useEffect(() => {
+    latest.current = state
     try {
       localStorage.setItem(KEY, JSON.stringify(state))
     } catch {
@@ -64,7 +69,15 @@ export function useCanvases() {
     (id: string) => patchNotes((ns) => ns.map((n) => (n.id === id ? { ...n, z: topZ(ns) } : n))),
     [patchNotes],
   )
-  const remove = useCallback((id: string) => patchNotes((ns) => ns.filter((n) => n.id !== id)), [patchNotes])
+  const remove = useCallback(
+    (id: string) => {
+      const s = latest.current
+      const clip = s.canvases.find((c) => c.id === s.activeId)?.notes.find((n) => n.id === id)?.audio
+      if (clip) void deleteAudio([clip.id])
+      patchNotes((ns) => ns.filter((n) => n.id !== id))
+    },
+    [patchNotes],
+  )
 
   const setTagOrder = useCallback(
     (order: string[]) =>
@@ -86,11 +99,20 @@ export function useCanvases() {
     setState((s) => ({ ...s, canvases: s.canvases.map((c) => (c.id === id ? { ...c, name: clean } : c)) }))
   }, [])
   const removeCanvas = useCallback((id: string) => {
+    const gone = latest.current.canvases.length > 1 ? latest.current.canvases.find((c) => c.id === id) : undefined
+    if (gone) void deleteAudio(audioIds([gone]))
     setState((s) => {
       if (s.canvases.length <= 1) return s
       const canvases = s.canvases.filter((c) => c.id !== id)
       return { canvases, activeId: s.activeId === id ? canvases[0].id : s.activeId }
     })
+  }, [])
+
+  // import: drop recordings the new state no longer references (backups keep the reference but not the audio itself)
+  const replaceAll = useCallback((next: State) => {
+    const keep = new Set(audioIds(next.canvases))
+    void deleteAudio(audioIds(latest.current.canvases).filter((id) => !keep.has(id)))
+    setState(next)
   }, [])
 
   const active = state.canvases.find((c) => c.id === state.activeId) ?? state.canvases[0]
@@ -109,6 +131,6 @@ export function useCanvases() {
     setTagOrder,
     add, update, remove, bringToFront,
     switchCanvas, addCanvas, renameCanvas, removeCanvas,
-    replaceAll: setState,
+    replaceAll,
   }
 }

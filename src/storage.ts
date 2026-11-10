@@ -1,8 +1,15 @@
-import { COLORS, NOTE_DEFAULT, type Canvas, type Note } from './types'
+import { COLORS, NOTE_DEFAULT, type AudioClip, type Canvas, type Note } from './types'
 
 export interface CanvasState {
   canvases: Canvas[]
   activeId: string
+}
+
+function parseAudio(a: unknown): AudioClip | undefined {
+  const v = a as Partial<AudioClip> | null
+  return v && typeof v.id === 'string' && typeof v.mime === 'string' && typeof v.duration === 'number' && Number.isFinite(v.duration) && v.duration > 0
+    ? { id: v.id, duration: v.duration, mime: v.mime }
+    : undefined
 }
 
 export function parseNotes(raw: unknown): Note[] {
@@ -18,6 +25,7 @@ export function parseNotes(raw: unknown): Note[] {
       draft: undefined, // a draft never survives a reload
       due: typeof n.due === 'string' && n.due ? n.due : undefined,
       tag: typeof n.tag === 'string' && n.tag.trim() ? n.tag.trim() : undefined,
+      audio: parseAudio(n.audio),
       w: typeof n.w === 'number' ? n.w : NOTE_DEFAULT.w,
       h: typeof n.h === 'number' ? n.h : NOTE_DEFAULT.h,
     }))

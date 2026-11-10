@@ -114,7 +114,7 @@ export function SettingsModal({ mode, theme, onMode, onTheme, onExport, onImport
             />
           </div>
           <p className="mt-2 text-xs text-base-content/50">
-            Exports all canvases, notes and theme to a JSON file. Importing replaces what's on this device.
+            Exports all canvases, notes and theme to a JSON file (voice recordings are not included). Importing replaces what's on this device.
           </p>
           {error && (
             <p role="alert" className="mt-2 text-xs text-error">

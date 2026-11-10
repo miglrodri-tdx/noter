@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { LuCalendar, LuLayers, LuLayoutGrid, LuStickyNote, LuTag } from 'react-icons/lu'
+import { LuCalendar, LuLayers, LuLayoutGrid, LuMic, LuStickyNote, LuTag } from 'react-icons/lu'
 
 export const ONBOARDED_KEY = 'noter:onboarded:v1'
 
@@ -33,14 +33,14 @@ const STEPS: Step[] = [
   {
     icon: <LuStickyNote size={22} />,
     title: 'Click anywhere to drop a note',
-    body: 'Every note is a card you can drag, resize, colour and collapse. Give it a due date or a tag right from the card.',
+    body: 'Every note is a card you can drag, resize, colour and collapse. Give it a due date or a tag, or record a voice note, right from the card.',
     art: (
       <div className="relative h-28 w-full">
         <div className={`note-yellow ${mini} absolute top-2 left-6 w-32 -rotate-3`}>Buy milk</div>
         <div className={`note-blue ${mini} absolute top-10 left-28 w-36 rotate-2`}>
           <p>Ship the release</p>
           <span className="mt-1 flex gap-1.5 text-base-content/50">
-            <LuCalendar size={12} /> <LuTag size={12} />
+            <LuCalendar size={12} /> <LuTag size={12} /> <LuMic size={12} />
           </span>
         </div>
         <div className={`note-green ${mini} absolute top-16 right-10 w-28 rotate-1`}>Call Ana</div>
