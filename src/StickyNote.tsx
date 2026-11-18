@@ -152,15 +152,17 @@ export function StickyNote({ note, tags, autoFocus, selected, onChange, onRemove
   const down = (e: PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return
     e.currentTarget.setPointerCapture(e.pointerId)
-    drag.current = { dx: e.clientX - note.x, dy: e.clientY - note.y }
+    const sc = e.currentTarget.closest<HTMLElement>('[data-canvas]')
+    drag.current = { dx: e.clientX + (sc?.scrollLeft ?? 0) - note.x, dy: e.clientY + (sc?.scrollTop ?? 0) - note.y }
     onFocus(note.id)
   }
   const move = (e: PointerEvent<HTMLDivElement>) => {
     const d = drag.current
     if (!d) return
+    const sc = e.currentTarget.closest<HTMLElement>('[data-canvas]')
     onChange(note.id, {
-      x: Math.max(0, Math.min(window.innerWidth - 40, e.clientX - d.dx)),
-      y: Math.max(0, Math.min(window.innerHeight - 40, e.clientY - d.dy)),
+      x: Math.max(0, e.clientX + (sc?.scrollLeft ?? 0) - d.dx),
+      y: Math.max(0, e.clientY + (sc?.scrollTop ?? 0) - d.dy),
     })
   }
   const up = () => {

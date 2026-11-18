@@ -166,7 +166,8 @@ export default function App() {
       )}
       {view === "canvas" && (
       <main
-        className="relative size-full cursor-crosshair bg-base-100"
+        data-canvas
+        className="relative size-full cursor-crosshair overflow-auto bg-base-100"
         onPointerDown={() => {
           // remember the selection before the blur of a draft note removes it
           hadSelection.current = selectedId !== null;
@@ -180,16 +181,25 @@ export default function App() {
             (document.activeElement as HTMLElement | null)?.blur();
             return;
           }
+          const el = e.currentTarget;
           const x = Math.max(
             8,
-            Math.min(window.innerWidth - NOTE_W - 8, e.clientX - NOTE_W / 2),
+            Math.min(window.innerWidth - NOTE_W - 8, e.clientX - NOTE_W / 2) + el.scrollLeft,
           );
-          const y = Math.max(8, e.clientY - 12);
+          const y = Math.max(8, e.clientY - 12 + el.scrollTop);
           const id = c.add(x, y);
           setFocusId(id);
           setSelectedId(id);
         }}
       >
+        {/* grows with the furthest card so the page scrolls instead of clipping */}
+        <div
+          className="pointer-events-none absolute top-0 left-0"
+          style={{
+            width: Math.max(0, ...c.notes.map((n) => n.x + n.w)) + 48,
+            height: Math.max(0, ...c.notes.map((n) => n.y + n.h)) + 48,
+          }}
+        />
         {c.notes.length === 0 && (
           <p className="pointer-events-none absolute inset-0 grid place-items-center text-sm font-light text-base-content/25 select-none">
             Click anywhere to add a note
